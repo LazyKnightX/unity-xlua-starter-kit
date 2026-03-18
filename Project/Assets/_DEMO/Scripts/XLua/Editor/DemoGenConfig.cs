@@ -34,7 +34,7 @@ public static class DemoGenConfig
                 // typeof(MonoBehaviour),
                 // typeof(ParticleSystem),
                 // typeof(SkinnedMeshRenderer),
-                // typeof(Renderer),
+                typeof(Renderer),
                 // typeof(WWW),
                 // typeof(Light),
                 // typeof(Mathf),

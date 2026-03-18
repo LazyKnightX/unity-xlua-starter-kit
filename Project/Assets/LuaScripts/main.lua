@@ -1,0 +1,2 @@
+print("LuaScript main executed!")
+

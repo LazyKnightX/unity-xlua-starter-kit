@@ -40,7 +40,7 @@ public class XLuaManager : MonoBehaviour
 
         luaEnv.AddLoader(CustomLuaLoader);
         luaEnv.DoString("require 'main'", "XLuaManager", scriptScopeTable);
-        Debug.Log("Lua 环境初始化成功，当前版本: " + luaEnv.DoString("return _VERSION")[0]);
+        Debug.Log("xLua环境初始化成功！");
 
         Action luaAwake = scriptScopeTable.Get<Action>("awake");
         scriptScopeTable.Get("start", out luaStart);

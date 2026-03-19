@@ -1,5 +1,5 @@
 -- main.lua
-print('xLua 演示启动！当前版本：' .. _VERSION)
+print('Lua 加载成功，当前版本：' .. _VERSION)
 
 -- 安全访问标记符
 -- eg. alloc_unit(((data or E).config or E).gid or 'u000', pid)

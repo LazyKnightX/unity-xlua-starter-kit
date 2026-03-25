@@ -10,9 +10,9 @@ public class XLuaManager : MonoBehaviour
 {
     private static LuaEnv luaEnv = new LuaEnv();
 
-    private LuaTable scriptScopeTable;
     public Injection[] injections;
 
+    private Action luaAwake;
     private Action luaStart;
     private Action luaUpdate;
     private Action luaOnDestroy;
@@ -24,29 +24,18 @@ public class XLuaManager : MonoBehaviour
 
     private void InitLuaEnv()
     {
-        scriptScopeTable = luaEnv.NewTable();
-
-        using (LuaTable meta = luaEnv.NewTable())
-        {
-            meta.Set("__index", luaEnv.Global);
-            scriptScopeTable.SetMetaTable(meta);
-        }
-
-        scriptScopeTable.Set("self", this);
-        foreach (var injection in injections)
-        {
-            scriptScopeTable.Set(injection.name, injection.value);
-        }
-
+        foreach (var injection in injections) luaEnv.Global.Set(injection.name, injection.value);
+        
         luaEnv.AddLoader(CustomLuaLoader);
-        luaEnv.DoString("require 'main'", "XLuaManager", scriptScopeTable);
+        luaEnv.DoString("require 'main'", "global_init");
+
+        luaEnv.Global.Get("awake", out luaAwake);
+        luaEnv.Global.Get("start", out luaStart);
+        luaEnv.Global.Get("update", out luaUpdate);
+        luaEnv.Global.Get("ondestroy", out luaOnDestroy);
+        
         Debug.Log("xLua环境初始化成功！");
-
-        Action luaAwake = scriptScopeTable.Get<Action>("awake");
-        scriptScopeTable.Get("start", out luaStart);
-        scriptScopeTable.Get("update", out luaUpdate);
-        scriptScopeTable.Get("ondestroy", out luaOnDestroy);
-
+        
         luaAwake?.Invoke();
     }
 
@@ -189,8 +178,6 @@ public class XLuaManager : MonoBehaviour
 
     private void Update()
     {
-        // Debug.Log("XLuaManager Update");
-
         luaUpdate?.Invoke();
 
         // 定时GC 移动端性能更优
@@ -204,12 +191,8 @@ public class XLuaManager : MonoBehaviour
     private void OnDestroy()
     {
         luaOnDestroy?.Invoke();
-
-        scriptScopeTable.Dispose();
-
-        luaOnDestroy = null;
-        luaUpdate = null;
-        luaStart = null;
+        
+        luaAwake = luaStart = luaUpdate = luaOnDestroy = null;
         luaEnv = null;
         injections = null;
     }
